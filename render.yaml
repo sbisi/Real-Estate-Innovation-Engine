@@ -3,7 +3,7 @@ services:
   - type: web
     name: rei-backend
     env: python
-    region: frankfurt
+    region: frankfurt   # ✅ Region ist hier erlaubt
     branch: main
     rootDir: backend
     buildCommand: |
@@ -14,7 +14,7 @@ services:
     autoDeploy: true
     envVars:
       - key: PYTHON_VERSION
-        value: 3.11.9   # ⚠️ Patch-Version zwingend!
+        value: 3.11.9   # Patch-Version nötig
       - key: FLASK_ENV
         value: production
       - key: CORS_ORIGINS
