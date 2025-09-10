@@ -3,6 +3,7 @@ services:
   - type: web
     name: rei-backend
     env: python
+    region: frankfurt
     branch: main
     rootDir: backend
     buildCommand: |
@@ -13,10 +14,9 @@ services:
     autoDeploy: true
     envVars:
       - key: PYTHON_VERSION
-        value: 3.11
+        value: 3.11.9   # ⚠️ Patch-Version zwingend!
       - key: FLASK_ENV
         value: production
-      # Beispiel: CORS Ursprünge (optional, wenn Du im Backend prüfst)
       - key: CORS_ORIGINS
         value: https://rei-frontend.onrender.com
 
@@ -32,6 +32,5 @@ services:
     staticPublishPath: dist
     autoDeploy: true
     envVars:
-      # Render-URL des Backends nach dem ersten Deploy hier eintragen
       - key: VITE_API_BASE_URL
         value: https://rei-backend.onrender.com
