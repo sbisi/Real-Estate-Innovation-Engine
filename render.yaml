@@ -3,7 +3,6 @@ services:
   - type: web
     name: rei-backend
     env: python
-    region: frankfurt
     branch: main
     rootDir: backend
     buildCommand: |
