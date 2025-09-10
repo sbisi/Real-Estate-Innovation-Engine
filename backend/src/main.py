@@ -1,43 +1,38 @@
-import os
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
+from flask import Flask, jsonify
 from flask_cors import CORS
+import os
 
 app = Flask(__name__)
 CORS(app)
 
-# Render.com-kompatible Datenbankkonfiguration
-if os.environ.get('RENDER'):
-    # Für Render.com: In-Memory oder temporäre Datei
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///tmp/data.db'
-else:
-    # Für lokale Entwicklung
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'
-
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-db = SQLAlchemy(app)
-
-# Importiere Models nach db-Definition
-from src.models.content import Content
-from src.models.user import User
-
-# Importiere Routes
-from src.routes.content import content_bp
-from src.routes.user import user_bp
-
-app.register_blueprint(content_bp, url_prefix='/api')
-app.register_blueprint(user_bp, url_prefix='/api')
+# Dummy-Daten für Testing
+DEMO_CONTENTS = [
+    {
+        "id": 1,
+        "title": "Smart Building IoT Integration",
+        "short_description": "Internet of Things sensors for intelligent building management.",
+        "content_type": "technology",
+        "industry": "Real Estate",
+        "time_horizon": "short",
+        "creator_username": "tech_expert",
+        "created_at": "2024-01-15T10:00:00Z",
+        "average_rating": 4.2,
+        "rating_count": 15,
+        "comment_count": 8
+    }
+]
 
 @app.route('/')
 def home():
     return {"message": "Real Estate Innovation Engine API is running!"}
 
+@app.route('/api/contents')
+def get_contents():
+    return jsonify(DEMO_CONTENTS)
+
 @app.route('/health')
 def health():
-    return {"status": "healthy", "database": "connected"}
+    return {"status": "healthy", "mode": "demo"}
 
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
     app.run(debug=True)
