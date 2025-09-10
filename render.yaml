@@ -24,7 +24,6 @@ services:
   - type: web
     name: rei-frontend
     env: static
-    region: frankfurt
     branch: main
     rootDir: frontend
     buildCommand: |
