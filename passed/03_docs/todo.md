@@ -1,0 +1,17 @@
+- [x] Set up project structure (Flask backend, React frontend)
+- [x] Implement basic user authentication (login/logout)
+- [x] Implement 'Add & Connect' module:
+  - [x] Manual content entry form
+  - [x] Display added content
+- [x] Implement 'Explore & Select' module:
+  - [x] Display all content (simple list/grid)
+  - [x] Basic search functionality
+  - [x] Basic filtering (e.g., by content type)
+- [x] Implement 'Rate & Create' module
+- [x] Implement 'Ideate & Realize' module
+- [x] Implement basic API endpoints for content management
+- [x] Set up a simple database (SQLite for prototype)
+- [x] Create a basic UI for the implemented modules
+- [x] Test the prototype locally
+- [x] Prepare documentation for the prototype
+

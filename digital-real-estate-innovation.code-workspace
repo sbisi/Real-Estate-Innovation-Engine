@@ -1,0 +1,113 @@
+{
+  "folders": [
+    {
+      "name": "Backend (Flask)",
+      "path": "./backend"
+    },
+    {
+      "name": "Frontend (React)",
+      "path": "./frontend"
+    }
+  ],
+  "settings": {
+    "python.defaultInterpreterPath": "./backend/venv/bin/python",
+    "python.terminal.activateEnvironment": true,
+    "eslint.workingDirectories": ["frontend"],
+    "typescript.preferences.includePackageJsonAutoImports": "auto",
+    "emmet.includeLanguages": {
+      "javascript": "javascriptreact"
+    },
+    "files.associations": {
+      "*.jsx": "javascriptreact"
+    }
+  },
+  "extensions": {
+    "recommendations": [
+      "ms-python.python",
+      "ms-python.flake8",
+      "bradlc.vscode-tailwindcss",
+      "esbenp.prettier-vscode",
+      "ms-vscode.vscode-eslint",
+      "formulahendry.auto-rename-tag",
+      "christian-kohler.path-intellisense",
+      "humao.rest-client"
+    ]
+  },
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Start Backend",
+        "type": "shell",
+        "command": "python",
+        "args": ["src/main.py"],
+        "options": {
+          "cwd": "${workspaceFolder}/backend"
+        },
+        "group": "build",
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "focus": false,
+          "panel": "new"
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "Start Frontend",
+        "type": "shell",
+        "command": "npm",
+        "args": ["run", "dev"],
+        "options": {
+          "cwd": "${workspaceFolder}/frontend"
+        },
+        "group": "build",
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "focus": false,
+          "panel": "new"
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "Install Backend Dependencies",
+        "type": "shell",
+        "command": "pip",
+        "args": ["install", "-r", "requirements.txt"],
+        "options": {
+          "cwd": "${workspaceFolder}/backend"
+        },
+        "group": "build"
+      },
+      {
+        "label": "Install Frontend Dependencies",
+        "type": "shell",
+        "command": "npm",
+        "args": ["install"],
+        "options": {
+          "cwd": "${workspaceFolder}/frontend"
+        },
+        "group": "build"
+      }
+    ]
+  },
+  "launch": {
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Python: Flask Backend",
+        "type": "python",
+        "request": "launch",
+        "program": "${workspaceFolder}/backend/src/main.py",
+        "console": "integratedTerminal",
+        "cwd": "${workspaceFolder}/backend",
+        "env": {
+          "FLASK_ENV": "development",
+          "FLASK_DEBUG": "1"
+        }
+      }
+    ]
+  }
+}
+
