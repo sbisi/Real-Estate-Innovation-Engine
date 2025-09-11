@@ -10,12 +10,20 @@ export default defineConfig({
     }
   },
   build: {
-    outDir: 'dist'
+    outDir: 'dist',
+    assetsDir: 'assets',
+    sourcemap: false,
+    rollupOptions: {
+      output: {
+        manualChunks: undefined
+      }
+    }
   },
+  base: './', // Important for deployment
   server: {
     proxy: {
       '/api': {
-        target: 'https://rei-backend-mtcr.onrender.com',  // Your backend URL
+        target: 'https://rei-backend-mtcr.onrender.com',
         changeOrigin: true,
         secure: true
       }
