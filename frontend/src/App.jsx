@@ -100,7 +100,7 @@ function App() {
                 color: '#6b7280',
                 margin: 0
               }}>
-                Powered by AI & Data Analytics
+                suprise for Rebekka :-)
               </p>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
