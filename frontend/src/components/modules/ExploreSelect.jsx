@@ -1,24 +1,114 @@
 import { useState, useEffect } from 'react'
-import { Button } from '@/components/ui/button.jsx'
-import { Input } from '@/components/ui/input.jsx'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select.jsx'
-import { Badge } from '@/components/ui/badge.jsx'
 import ContentCard from '../ContentCard.jsx'
 import { Search, Filter, Grid, List, TrendingUp, Cpu, Lightbulb } from 'lucide-react'
-import apiService from '../../services/api.js'
+
+// Local UI Components (to avoid import issues)
+const Button = ({ children, onClick, className = '', variant = 'default' }) => {
+  const baseClasses = 'px-4 py-2 rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'
+  const variants = {
+    default: 'bg-blue-600 text-white hover:bg-blue-700',
+    outline: 'border border-gray-300 bg-white hover:bg-gray-50 text-gray-700',
+    ghost: 'hover:bg-gray-100 text-gray-700'
+  }
+  return (
+    <button onClick={onClick} className={`${baseClasses} ${variants[variant]} ${className}`}>
+      {children}
+    </button>
+  )
+}
+
+const Input = ({ className = '', ...props }) => (
+  <input className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${className}`} {...props} />
+)
+
+const Select = ({ children, value, onValueChange }) => {
+  const [isOpen, setIsOpen] = useState(false)
+  
+  return (
+    <div className="relative">
+      {React.Children.map(children, child => {
+        if (child.type === SelectTrigger) {
+          return React.cloneElement(child, {
+            onClick: () => setIsOpen(!isOpen),
+            isOpen
+          })
+        }
+        if (child.type === SelectContent) {
+          return isOpen ? React.cloneElement(child, {
+            onValueChange: (val) => {
+              onValueChange(val)
+              setIsOpen(false)
+            }
+          }) : null
+        }
+        return child
+      })}
+    </div>
+  )
+}
+
+const SelectTrigger = ({ children, className = '', onClick, isOpen }) => (
+  <button
+    type="button"
+    onClick={onClick}
+    className={`flex h-10 w-full items-center justify-between rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ${className}`}
+  >
+    {children}
+    <svg className={`h-4 w-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+    </svg>
+  </button>
+)
+
+const SelectValue = ({ placeholder, children }) => (
+  <span className="block truncate">
+    {children || <span className="text-gray-500">{placeholder}</span>}
+  </span>
+)
+
+const SelectContent = ({ children, onValueChange }) => (
+  <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
+    {React.Children.map(children, child =>
+      React.cloneElement(child, { onValueChange })
+    )}
+  </div>
+)
+
+const SelectItem = ({ children, value, onValueChange }) => (
+  <div
+    className="relative flex cursor-pointer select-none items-center rounded-sm py-1.5 pl-2 pr-2 text-sm hover:bg-gray-100"
+    onClick={() => onValueChange(value)}
+  >
+    {children}
+  </div>
+)
+
+const Badge = ({ children, className = '', variant = 'default' }) => {
+  const variants = {
+    default: 'bg-gray-100 text-gray-800',
+    secondary: 'bg-blue-100 text-blue-800',
+    success: 'bg-green-100 text-green-800',
+    warning: 'bg-yellow-100 text-yellow-800',
+    danger: 'bg-red-100 text-red-800'
+  }
+  return (
+    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${variants[variant]} ${className}`}>
+      {children}
+    </span>
+  )
+}
 
 const ExploreSelect = () => {
   const [contents, setContents] = useState([])
   const [filteredContents, setFilteredContents] = useState([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedType, setSelectedType] = useState('all')
   const [selectedIndustry, setSelectedIndustry] = useState('all')
   const [viewMode, setViewMode] = useState('grid') // 'grid' or 'list'
   const [showFilters, setShowFilters] = useState(false)
 
-  // Mock data as fallback
+  // Mock data for demonstration
   const mockContents = [
     {
       id: 1,
@@ -57,7 +147,7 @@ const ExploreSelect = () => {
       content_type: "inspiration",
       industry: "Real Estate",
       time_horizon: "medium",
-      image_url: "https://images.unsplash.com/photo-1593508512255-86ab42a8e620?w=400&h=300&fit=crop",
+      image_url: "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=300&fit=crop",
       creator_username: "vr_innovator",
       created_at: "2024-01-13T09:15:00Z",
       average_rating: 4.5,
@@ -87,7 +177,7 @@ const ExploreSelect = () => {
       content_type: "trend",
       industry: "Real Estate",
       time_horizon: "short",
-      image_url: "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=400&h=300&fit=crop",
+      image_url: "https://images.unsplash.com/photo-1555636222-cae831e670b3?w=400&h=300&fit=crop",
       creator_username: "urban_planner",
       created_at: "2024-01-11T11:20:00Z",
       average_rating: 4.3,
@@ -98,32 +188,13 @@ const ExploreSelect = () => {
   ]
 
   useEffect(() => {
-    fetchContents()
-  }, [])
-
-  const fetchContents = async () => {
-    setLoading(true)
-    setError(null)
-    
-    try {
-      const response = await apiService.getContents()
-      if (response && response.length > 0) {
-        setContents(response)
-        setFilteredContents(response)
-      } else {
-        // Use mock data if no data from API
-        setContents(mockContents)
-        setFilteredContents(mockContents)
-      }
-    } catch (err) {
-      console.error('Failed to fetch contents:', err)
-      // Fallback to mock data (silently)
+    // Simulate API call
+    setTimeout(() => {
       setContents(mockContents)
       setFilteredContents(mockContents)
-    } finally {
       setLoading(false)
-    }
-  }
+    }, 1000)
+  }, [])
 
   useEffect(() => {
     let filtered = contents
@@ -149,48 +220,56 @@ const ExploreSelect = () => {
     setFilteredContents(filtered)
   }, [contents, searchTerm, selectedType, selectedIndustry])
 
-  const handleRate = async (contentId, rating) => {
-    try {
-      await apiService.rateContent(contentId, rating)
-      // Refresh the content to get updated ratings
-      fetchContents()
-    } catch (error) {
-      console.error('Failed to rate content:', error)
-    }
-  }
-
-  const handleComment = (content) => {
-    console.log(`Opening comment dialog for content ${content.id}`)
-    // Here you would open a comment dialog or navigate to detail view
-  }
-
-  const handleView = (content) => {
-    console.log(`Viewing details for content ${content.id}`)
-    // Here you would navigate to detail view or open a modal
-  }
-
   const getTypeIcon = (type) => {
     switch (type) {
-      case 'trend': return <TrendingUp className="h-4 w-4" />
-      case 'technology': return <Cpu className="h-4 w-4" />
-      case 'inspiration': return <Lightbulb className="h-4 w-4" />
-      default: return null
+      case 'technology':
+        return <Cpu className="h-4 w-4" />
+      case 'trend':
+        return <TrendingUp className="h-4 w-4" />
+      case 'inspiration':
+        return <Lightbulb className="h-4 w-4" />
+      default:
+        return null
     }
   }
 
-  const typeStats = {
-    all: contents.length,
-    trend: contents.filter(c => c.content_type === 'trend').length,
-    technology: contents.filter(c => c.content_type === 'technology').length,
-    inspiration: contents.filter(c => c.content_type === 'inspiration').length
+  const getTypeBadgeVariant = (type) => {
+    switch (type) {
+      case 'technology':
+        return 'danger'
+      case 'trend':
+        return 'warning'
+      case 'inspiration':
+        return 'secondary'
+      default:
+        return 'default'
+    }
+  }
+
+  const getTimeHorizonBadgeVariant = (horizon) => {
+    switch (horizon) {
+      case 'short':
+        return 'success'
+      case 'medium':
+        return 'secondary'
+      case 'long':
+        return 'warning'
+      default:
+        return 'default'
+    }
   }
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading content...</p>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="animate-pulse">
+          <div className="h-8 bg-gray-200 rounded w-1/4 mb-4"></div>
+          <div className="h-4 bg-gray-200 rounded w-1/2 mb-8"></div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="h-64 bg-gray-200 rounded"></div>
+            ))}
+          </div>
         </div>
       </div>
     )
@@ -204,89 +283,70 @@ const ExploreSelect = () => {
         <p className="text-gray-600">
           Discover trends, technologies, and inspirations in the real estate industry
         </p>
-
       </div>
 
       {/* Search and Filters */}
       <div className="mb-6 space-y-4">
         <div className="flex flex-col sm:flex-row gap-4">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-            <Input
-              placeholder="Search trends, technologies, inspirations..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
+          <div className="flex-1">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <Input
+                placeholder="Search trends, technologies, inspirations..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
           </div>
-          <Button
-            variant="outline"
-            onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center space-x-2"
-          >
-            <Filter className="h-4 w-4" />
-            <span>Filters</span>
-          </Button>
-          <div className="flex items-center space-x-2">
+          <div className="flex gap-2">
             <Button
-              variant={viewMode === 'grid' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setViewMode('grid')}
+              variant="outline"
+              onClick={() => setShowFilters(!showFilters)}
             >
-              <Grid className="h-4 w-4" />
+              <Filter className="h-4 w-4 mr-2" />
+              Filters
             </Button>
             <Button
-              variant={viewMode === 'list' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setViewMode('list')}
+              variant="outline"
+              onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
             >
-              <List className="h-4 w-4" />
+              {viewMode === 'grid' ? (
+                <List className="h-4 w-4" />
+              ) : (
+                <Grid className="h-4 w-4" />
+              )}
             </Button>
           </div>
         </div>
 
+        {/* Filter Panel */}
         {showFilters && (
-          <div className="bg-gray-50 p-4 rounded-lg space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Content Type
                 </label>
                 <Select value={selectedType} onValueChange={setSelectedType}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select type" />
+                    <SelectValue placeholder="All Types" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Types ({typeStats.all})</SelectItem>
-                    <SelectItem value="trend">
-                      <div className="flex items-center space-x-2">
-                        {getTypeIcon('trend')}
-                        <span>Trends ({typeStats.trend})</span>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="technology">
-                      <div className="flex items-center space-x-2">
-                        {getTypeIcon('technology')}
-                        <span>Technologies ({typeStats.technology})</span>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="inspiration">
-                      <div className="flex items-center space-x-2">
-                        {getTypeIcon('inspiration')}
-                        <span>Inspirations ({typeStats.inspiration})</span>
-                      </div>
-                    </SelectItem>
+                    <SelectItem value="all">All Types</SelectItem>
+                    <SelectItem value="technology">Technology</SelectItem>
+                    <SelectItem value="trend">Trend</SelectItem>
+                    <SelectItem value="inspiration">Inspiration</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Industry
                 </label>
                 <Select value={selectedIndustry} onValueChange={setSelectedIndustry}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select industry" />
+                    <SelectValue placeholder="All Industries" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Industries</SelectItem>
@@ -296,60 +356,103 @@ const ExploreSelect = () => {
                   </SelectContent>
                 </Select>
               </div>
+              <div className="flex items-end">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setSelectedType('all')
+                    setSelectedIndustry('all')
+                    setSearchTerm('')
+                  }}
+                  className="w-full"
+                >
+                  Clear Filters
+                </Button>
+              </div>
             </div>
           </div>
         )}
       </div>
 
-      {/* Content Stats */}
-      <div className="mb-6 flex flex-wrap gap-2">
-        <Badge variant="secondary">
-          {filteredContents.length} results
-        </Badge>
-        {searchTerm && (
-          <Badge variant="outline">
-            Search: "{searchTerm}"
-          </Badge>
-        )}
-        {selectedType !== 'all' && (
-          <Badge variant="outline">
-            Type: {selectedType}
-          </Badge>
-        )}
-        {selectedIndustry !== 'all' && (
-          <Badge variant="outline">
-            Industry: {selectedIndustry}
-          </Badge>
-        )}
+      {/* Results Count */}
+      <div className="mb-6">
+        <p className="text-gray-600">{filteredContents.length} results</p>
       </div>
 
       {/* Content Grid/List */}
-      {filteredContents.length === 0 ? (
-        <div className="text-center py-12">
-          <div className="text-gray-400 mb-4">
-            <Search className="h-12 w-12 mx-auto" />
+      <div className={viewMode === 'grid' 
+        ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" 
+        : "space-y-4"
+      }>
+        {filteredContents.map((content) => (
+          <div key={content.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+            <div className="aspect-video bg-gray-200 relative">
+              <img 
+                src={content.image_url} 
+                alt={content.title}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.target.style.display = 'none'
+                  e.target.nextSibling.style.display = 'flex'
+                }}
+              />
+              <div className="hidden w-full h-full bg-gray-200 items-center justify-center">
+                <span className="text-gray-400">Image placeholder</span>
+              </div>
+              <div className="absolute top-2 left-2 flex gap-2">
+                <Badge variant={getTypeBadgeVariant(content.content_type)}>
+                  <span className="flex items-center gap-1">
+                    {getTypeIcon(content.content_type)}
+                    {content.content_type}
+                  </span>
+                </Badge>
+                <Badge variant="default">
+                  {content.industry}
+                </Badge>
+                <Badge variant={getTimeHorizonBadgeVariant(content.time_horizon)}>
+                  {content.time_horizon} term
+                </Badge>
+              </div>
+            </div>
+            <div className="p-4">
+              <h3 className="font-semibold text-lg mb-2">{content.title}</h3>
+              <p className="text-gray-600 text-sm mb-3">
+                by {content.creator_username} • {new Date(content.created_at).toLocaleDateString()}
+              </p>
+              <p className="text-gray-700 text-sm mb-4 line-clamp-3">
+                {content.short_description}
+              </p>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <Button variant="ghost" className="p-2">
+                    Like
+                  </Button>
+                  <Button variant="outline" className="text-sm">
+                    View Details
+                  </Button>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="flex items-center">
+                    <span className="text-sm font-medium">
+                      {content.average_rating} ({content.rating_count})
+                    </span>
+                  </div>
+                  <span className="text-gray-400">•</span>
+                  <span className="text-sm text-gray-600">{content.comment_count}</span>
+                </div>
+              </div>
+            </div>
           </div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No content found</h3>
+        ))}
+      </div>
+
+      {filteredContents.length === 0 && (
+        <div className="text-center py-12">
+          <Search className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 mb-2">No results found</h3>
           <p className="text-gray-600">
             Try adjusting your search terms or filters to find what you're looking for.
           </p>
-        </div>
-      ) : (
-        <div className={
-          viewMode === 'grid' 
-            ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-            : "space-y-4"
-        }>
-          {filteredContents.map((content) => (
-            <ContentCard
-              key={content.id}
-              content={content}
-              onRate={handleRate}
-              onComment={handleComment}
-              onView={handleView}
-              compact={viewMode === 'list'}
-            />
-          ))}
         </div>
       )}
     </div>
