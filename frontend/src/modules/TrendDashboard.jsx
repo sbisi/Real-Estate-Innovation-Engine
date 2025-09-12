@@ -1,10 +1,67 @@
 import { useState, useEffect } from 'react'
-import { Button } from '@/components/ui/button.jsx'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card.jsx'
-import { Badge } from '@/components/ui/badge.jsx'
-import { Input } from '@/components/ui/input.jsx'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select.jsx'
-import { Progress } from '@/components/ui/progress.jsx'
+
+const Button = ({ children, onClick, className = '', variant = 'default' }) => {
+  const variants = {
+    default: 'bg-blue-600 text-white hover:bg-blue-700',
+    outline: 'border border-gray-300 bg-white hover:bg-gray-50'
+  }
+  return (
+    <button onClick={onClick} className={`px-4 py-2 rounded-md font-medium transition-colors ${variants[variant]} ${className}`}>
+      {children}
+    </button>
+  )
+}
+
+const Card = ({ children, className = '' }) => (
+  <div className={`bg-white shadow rounded-lg ${className}`}>{children}</div>
+)
+
+const CardHeader = ({ children, className = '' }) => (
+  <div className={`px-6 py-4 border-b ${className}`}>{children}</div>
+)
+
+const CardTitle = ({ children, className = '' }) => (
+  <h3 className={`text-lg font-semibold ${className}`}>{children}</h3>
+)
+
+const CardDescription = ({ children, className = '' }) => (
+  <p className={`text-gray-600 ${className}`}>{children}</p>
+)
+
+const CardContent = ({ children, className = '' }) => (
+  <div className={`px-6 py-4 ${className}`}>{children}</div>
+)
+
+const Badge = ({ children, className = '', style }) => (
+  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${className}`} style={style}>
+    {children}
+  </span>
+)
+
+const Input = ({ className = '', ...props }) => (
+  <input className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${className}`} {...props} />
+)
+
+const Progress = ({ value = 0, className = '' }) => (
+  <div className={`w-full bg-gray-200 rounded-full h-2 ${className}`}>
+    <div className="bg-blue-600 h-2 rounded-full transition-all duration-300" style={{ width: `${Math.min(100, Math.max(0, value))}%` }} />
+  </div>
+)
+
+// Vereinfachte Select-Komponenten
+const Select = ({ children, value, onValueChange }) => <div className="relative">{children}</div>
+const SelectTrigger = ({ children, className = '' }) => (
+  <button className={`w-full px-3 py-2 text-left border border-gray-300 rounded-md ${className}`}>{children}</button>
+)
+const SelectValue = ({ placeholder }) => <span className="text-gray-500">{placeholder}</span>
+const SelectContent = ({ children }) => (
+  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg">{children}</div>
+)
+const SelectItem = ({ children }) => (
+  <div className="px-3 py-2 hover:bg-gray-100 cursor-pointer">{children}</div>
+)
+
+
 import { 
   TrendingUp, TrendingDown, Activity, AlertTriangle, 
   BarChart3, PieChart, Target, Clock, Star, Filter,
