@@ -1,15 +1,11 @@
-import React from 'react'
+const Progress = ({ value = 0, className = '' }) => (
+  <div className={`w-full bg-gray-200 rounded-full h-2 ${className}`}>
+    <div 
+      className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
+      style={{ width: `${Math.min(100, Math.max(0, value))}%` }} 
+    />
+  </div>
+)
 
-export const Progress = ({ value = 0, className = '', max = 100 }) => {
-  const percentage = Math.min(100, Math.max(0, (value / max) * 100))
-  
-  return (
-    <div className={`relative h-4 w-full overflow-hidden rounded-full bg-gray-100 ${className}`}>
-      <div
-        className="h-full w-full flex-1 bg-blue-600 transition-all duration-300 ease-in-out"
-        style={{ transform: `translateX(-${100 - percentage}%)` }}
-      />
-    </div>
-  )
-}
+export { Progress }
 

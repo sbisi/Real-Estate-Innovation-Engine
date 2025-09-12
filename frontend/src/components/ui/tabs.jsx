@@ -1,23 +1,17 @@
-import React, { useState, createContext, useContext } from 'react'
+import { useState, createContext, useContext } from 'react'
 
 const TabsContext = createContext()
 
-export const Tabs = ({ children, defaultValue, value, onValueChange, className = '' }) => {
+const Tabs = ({ children, defaultValue, value, onValueChange, className = '' }) => {
   const [activeTab, setActiveTab] = useState(value || defaultValue)
   
-  const handleValueChange = (newValue) => {
-    if (value === undefined) {
-      setActiveTab(newValue)
-    }
-    if (onValueChange) {
-      onValueChange(newValue)
-    }
+  const handleTabChange = (newValue) => {
+    setActiveTab(newValue)
+    if (onValueChange) onValueChange(newValue)
   }
 
-  const currentValue = value !== undefined ? value : activeTab
-
   return (
-    <TabsContext.Provider value={{ activeTab: currentValue, onValueChange: handleValueChange }}>
+    <TabsContext.Provider value={{ activeTab, setActiveTab: handleTabChange }}>
       <div className={className}>
         {children}
       </div>
@@ -25,40 +19,41 @@ export const Tabs = ({ children, defaultValue, value, onValueChange, className =
   )
 }
 
-export const TabsList = ({ children, className = '' }) => (
-  <div className={`inline-flex h-10 items-center justify-center rounded-md bg-gray-100 p-1 text-gray-500 ${className}`}>
+const TabsList = ({ children, className = '' }) => (
+  <div className={`flex space-x-1 bg-gray-100 p-1 rounded-lg ${className}`}>
     {children}
   </div>
 )
 
-export const TabsTrigger = ({ children, value, className = '' }) => {
-  const { activeTab, onValueChange } = useContext(TabsContext)
+const TabsTrigger = ({ children, value, className = '' }) => {
+  const { activeTab, setActiveTab } = useContext(TabsContext)
   const isActive = activeTab === value
-  
+
   return (
     <button
-      type="button"
-      onClick={() => onValueChange(value)}
-      className={`inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-white transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 ${
+      className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
         isActive 
-          ? 'bg-white text-gray-950 shadow-sm' 
-          : 'hover:bg-gray-200 hover:text-gray-900'
+          ? 'bg-white text-gray-900 shadow-sm' 
+          : 'text-gray-600 hover:text-gray-900'
       } ${className}`}
+      onClick={() => setActiveTab(value)}
     >
       {children}
     </button>
   )
 }
 
-export const TabsContent = ({ children, value, className = '' }) => {
+const TabsContent = ({ children, value, className = '' }) => {
   const { activeTab } = useContext(TabsContext)
   
   if (activeTab !== value) return null
-  
+
   return (
-    <div className={`mt-2 ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${className}`}>
+    <div className={`mt-4 ${className}`}>
       {children}
     </div>
   )
 }
+
+export { Tabs, TabsList, TabsTrigger, TabsContent }
 
