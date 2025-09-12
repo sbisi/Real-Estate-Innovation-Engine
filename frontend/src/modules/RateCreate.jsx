@@ -1,41 +1,109 @@
 import { useState, useEffect } from 'react'
-import { Button } from '@/components/ui/button.jsx'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card.jsx'
-import { Badge } from '@/components/ui/badge.jsx'
-import { Input } from '@/components/ui/input.jsx'
-import { Textarea } from '@/components/ui/textarea.jsx'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select.jsx'
-import ContentCard from '../ContentCard.jsx'
-import { Star, Plus, Target, TrendingUp, Lightbulb, Users, BarChart3 } from 'lucide-react'
+
+// Simple SVG Icons (NO external dependencies)
+const StarIcon = ({ filled = false }) => (
+  <svg className="h-5 w-5" fill={filled ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+  </svg>
+)
+
+const ThumbsUpIcon = () => (
+  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
+  </svg>
+)
+
+const MessageCircleIcon = () => (
+  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+  </svg>
+)
+
+const SendIcon = () => (
+  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+  </svg>
+)
+
+// Local UI Components (NO external dependencies)
+const Button = ({ children, onClick, className = '', variant = 'default', disabled = false }) => {
+  const baseClasses = 'px-4 py-2 rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed'
+  const variants = {
+    default: 'bg-blue-600 text-white hover:bg-blue-700',
+    outline: 'border border-gray-300 bg-white hover:bg-gray-50 text-gray-700',
+    ghost: 'hover:bg-gray-100 text-gray-700'
+  }
+  return (
+    <button onClick={onClick} disabled={disabled} className={`${baseClasses} ${variants[variant]} ${className}`}>
+      {children}
+    </button>
+  )
+}
+
+const Card = ({ children, className = '' }) => (
+  <div className={`bg-white shadow rounded-lg ${className}`}>{children}</div>
+)
+
+const CardHeader = ({ children, className = '' }) => (
+  <div className={`px-6 py-4 border-b ${className}`}>{children}</div>
+)
+
+const CardTitle = ({ children, className = '' }) => (
+  <h3 className={`text-lg font-semibold ${className}`}>{children}</h3>
+)
+
+const CardDescription = ({ children, className = '' }) => (
+  <p className={`text-gray-600 ${className}`}>{children}</p>
+)
+
+const CardContent = ({ children, className = '' }) => (
+  <div className={`px-6 py-4 ${className}`}>{children}</div>
+)
+
+const Badge = ({ children, className = '', variant = 'default' }) => {
+  const variants = {
+    default: 'bg-gray-100 text-gray-800',
+    secondary: 'bg-blue-100 text-blue-800',
+    success: 'bg-green-100 text-green-800',
+    warning: 'bg-yellow-100 text-yellow-800',
+    danger: 'bg-red-100 text-red-800'
+  }
+  return (
+    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${variants[variant]} ${className}`}>
+      {children}
+    </span>
+  )
+}
+
+const Textarea = ({ className = '', ...props }) => (
+  <textarea className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${className}`} {...props} />
+)
 
 const RateCreate = () => {
-  const [selectedContents, setSelectedContents] = useState([])
-  const [opportunitySpaces, setOpportunitySpaces] = useState([])
-  const [showCreateSpace, setShowCreateSpace] = useState(false)
-  const [newSpace, setNewSpace] = useState({
-    title: '',
-    description: '',
-    criteria: {
-      revenue_potential: 0,
-      efficiency_gain: 0,
-      competitive_advantage: 0,
-      risk_mitigation: 0,
-      feasibility: 0
-    }
-  })
+  const [contents, setContents] = useState([])
+  const [selectedContent, setSelectedContent] = useState(null)
+  const [rating, setRating] = useState(0)
+  const [hoverRating, setHoverRating] = useState(0)
+  const [comment, setComment] = useState('')
+  const [loading, setLoading] = useState(true)
 
-  // Mock selected content data
-  const mockSelectedContents = [
+  // Mock data
+  const mockContents = [
     {
       id: 1,
       title: "Smart Building IoT Integration",
       short_description: "Internet of Things sensors and devices for intelligent building management and energy optimization.",
       content_type: "technology",
       industry: "Real Estate",
+      time_horizon: "short",
+      image_url: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=300&fit=crop",
+      creator_username: "tech_expert",
+      created_at: "2024-01-15T10:00:00Z",
       average_rating: 4.2,
       rating_count: 15,
       comment_count: 8,
-      user_rating: null
+      user_rating: null,
+      user_comment: null
     },
     {
       id: 2,
@@ -43,364 +111,287 @@ const RateCreate = () => {
       short_description: "Growing trend towards eco-friendly and sustainable urban planning and development practices.",
       content_type: "trend",
       industry: "Real Estate",
+      time_horizon: "long",
+      image_url: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=400&h=300&fit=crop",
+      creator_username: "sustainability_pro",
+      created_at: "2024-01-14T14:30:00Z",
       average_rating: 4.7,
       rating_count: 23,
       comment_count: 12,
-      user_rating: 5
-    },
-    {
-      id: 3,
-      title: "Virtual Property Tours Platform",
-      short_description: "Innovative VR/AR platform enabling immersive virtual property viewings and remote inspections.",
-      content_type: "inspiration",
-      industry: "Real Estate",
-      average_rating: 4.5,
-      rating_count: 19,
-      comment_count: 6,
-      user_rating: 4
-    }
-  ]
-
-  const mockOpportunitySpaces = [
-    {
-      id: 1,
-      title: "Smart Sustainable Buildings",
-      description: "Combining IoT technology with sustainable practices for next-generation building management",
-      content_count: 3,
-      average_score: 4.2,
-      created_at: "2024-01-15T10:00:00Z"
-    },
-    {
-      id: 2,
-      title: "Virtual Real Estate Experience",
-      description: "Leveraging VR/AR technology to transform property viewing and marketing",
-      content_count: 2,
-      average_score: 4.5,
-      created_at: "2024-01-14T14:30:00Z"
+      user_rating: 5,
+      user_comment: "Excellent trend analysis!"
     }
   ]
 
   useEffect(() => {
-    setSelectedContents(mockSelectedContents)
-    setOpportunitySpaces(mockOpportunitySpaces)
+    setTimeout(() => {
+      setContents(mockContents)
+      setLoading(false)
+    }, 1000)
   }, [])
 
-  const handleRateContent = (contentId, rating, criteria = 'overall') => {
-    setSelectedContents(prev => prev.map(content => 
-      content.id === contentId 
-        ? { ...content, user_rating: rating }
-        : content
-    ))
-    console.log(`Rating content ${contentId}: ${rating} stars for ${criteria}`)
-  }
+  const handleRateContent = (contentId, newRating, newComment) => {
+    setContents(prev => prev.map(content => {
+      if (content.id === contentId) {
+        const wasRated = content.user_rating !== null
+        const ratingDiff = newRating - (content.user_rating || 0)
+        const newRatingCount = wasRated ? content.rating_count : content.rating_count + 1
+        const newAverageRating = wasRated 
+          ? ((content.average_rating * content.rating_count) - (content.user_rating || 0) + newRating) / content.rating_count
+          : ((content.average_rating * content.rating_count) + newRating) / newRatingCount
 
-  const handleCreateOpportunitySpace = () => {
-    if (!newSpace.title.trim()) return
-
-    const space = {
-      id: Date.now(),
-      ...newSpace,
-      content_count: 0,
-      average_score: 0,
-      created_at: new Date().toISOString()
-    }
-
-    setOpportunitySpaces(prev => [space, ...prev])
-    setNewSpace({
-      title: '',
-      description: '',
-      criteria: {
-        revenue_potential: 0,
-        efficiency_gain: 0,
-        competitive_advantage: 0,
-        risk_mitigation: 0,
-        feasibility: 0
+        return {
+          ...content,
+          user_rating: newRating,
+          user_comment: newComment,
+          average_rating: Math.round(newAverageRating * 10) / 10,
+          rating_count: newRatingCount,
+          comment_count: newComment && !content.user_comment ? content.comment_count + 1 : content.comment_count
+        }
       }
-    })
-    setShowCreateSpace(false)
+      return content
+    }))
+
+    setSelectedContent(null)
+    setRating(0)
+    setComment('')
   }
 
-  const RatingStars = ({ rating, onRate, size = 'sm' }) => {
-    const starSize = size === 'sm' ? 'h-4 w-4' : 'h-5 w-5'
-    
+  const StarRating = ({ value, onChange, readonly = false }) => {
     return (
       <div className="flex space-x-1">
         {[1, 2, 3, 4, 5].map((star) => (
           <button
             key={star}
-            onClick={() => onRate && onRate(star)}
-            className={`${starSize} ${
-              star <= rating 
-                ? 'text-yellow-400 fill-current' 
-                : 'text-gray-300'
-            } ${onRate ? 'hover:text-yellow-400 cursor-pointer' : ''}`}
+            type="button"
+            disabled={readonly}
+            className={`${readonly ? 'cursor-default' : 'cursor-pointer hover:scale-110'} transition-transform`}
+            onClick={() => !readonly && onChange && onChange(star)}
+            onMouseEnter={() => !readonly && setHoverRating && setHoverRating(star)}
+            onMouseLeave={() => !readonly && setHoverRating && setHoverRating(0)}
           >
-            <Star className={starSize} />
+            <StarIcon 
+              filled={star <= (readonly ? value : (hoverRating || rating))} 
+              className={star <= (readonly ? value : (hoverRating || rating)) ? 'text-yellow-400' : 'text-gray-300'}
+            />
           </button>
         ))}
       </div>
     )
   }
 
-  const CriteriaRating = ({ label, value, onChange, description }) => (
-    <div className="space-y-2">
-      <div className="flex justify-between items-center">
-        <label className="text-sm font-medium text-gray-700">{label}</label>
-        <span className="text-sm text-gray-500">{value}/5</span>
+  if (loading) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="animate-pulse">
+          <div className="h-8 bg-gray-200 rounded w-1/4 mb-4"></div>
+          <div className="h-4 bg-gray-200 rounded w-1/2 mb-8"></div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="h-64 bg-gray-200 rounded"></div>
+            ))}
+          </div>
+        </div>
       </div>
-      <RatingStars rating={value} onRate={onChange} />
-      <p className="text-xs text-gray-500">{description}</p>
-    </div>
-  )
+    )
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Header */}
       <div className="mb-8">
         <h2 className="text-3xl font-bold text-gray-900 mb-2">Rate & Create</h2>
         <p className="text-gray-600">
-          Evaluate selected content and create strategic opportunity spaces
+          Rate existing content and create reviews to help the community
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Selected Content for Rating */}
-        <div className="lg:col-span-2">
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-xl font-semibold text-gray-900">Selected Content</h3>
-            <Badge variant="secondary">
-              {selectedContents.length} items
-            </Badge>
-          </div>
-
-          {selectedContents.length === 0 ? (
-            <Card>
-              <CardContent className="p-8 text-center">
-                <TrendingUp className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <h4 className="text-lg font-medium text-gray-900 mb-2">No Content Selected</h4>
-                <p className="text-gray-600 mb-4">
-                  Go to Explore & Select to choose content for evaluation
-                </p>
-                <Button variant="outline">
-                  Explore Content
-                </Button>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="space-y-6">
-              {selectedContents.map((content) => (
-                <Card key={content.id}>
-                  <CardHeader>
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <CardTitle className="text-lg">{content.title}</CardTitle>
-                        <CardDescription className="mt-1">
-                          {content.short_description}
-                        </CardDescription>
-                      </div>
-                      <Badge className={
-                        content.content_type === 'trend' ? 'bg-blue-100 text-blue-800' :
-                        content.content_type === 'technology' ? 'bg-green-100 text-green-800' :
-                        'bg-purple-100 text-purple-800'
-                      }>
-                        {content.content_type}
-                      </Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      {/* Overall Rating */}
-                      <div>
-                        <h5 className="font-medium text-gray-900 mb-3">Your Overall Rating</h5>
-                        <div className="flex items-center space-x-3">
-                          <RatingStars 
-                            rating={content.user_rating || 0} 
-                            onRate={(rating) => handleRateContent(content.id, rating)}
-                          />
-                          <span className="text-sm text-gray-500">
-                            {content.user_rating ? `${content.user_rating}/5` : 'Not rated'}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Community Rating */}
-                      <div>
-                        <h5 className="font-medium text-gray-900 mb-3">Community Rating</h5>
-                        <div className="flex items-center space-x-3">
-                          <RatingStars rating={Math.round(content.average_rating)} />
-                          <span className="text-sm text-gray-500">
-                            {content.average_rating.toFixed(1)}/5 ({content.rating_count} ratings)
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Detailed Criteria Rating */}
-                    <div className="mt-6 pt-6 border-t">
-                      <h5 className="font-medium text-gray-900 mb-4">Detailed Evaluation</h5>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <CriteriaRating
-                          label="Relevance"
-                          value={0}
-                          onChange={(rating) => handleRateContent(content.id, rating, 'relevance')}
-                          description="How relevant is this to your business?"
-                        />
-                        <CriteriaRating
-                          label="Feasibility"
-                          value={0}
-                          onChange={(rating) => handleRateContent(content.id, rating, 'feasibility')}
-                          description="How feasible is implementation?"
-                        />
-                        <CriteriaRating
-                          label="Impact"
-                          value={0}
-                          onChange={(rating) => handleRateContent(content.id, rating, 'impact')}
-                          description="What's the potential business impact?"
-                        />
-                        <CriteriaRating
-                          label="Innovation"
-                          value={0}
-                          onChange={(rating) => handleRateContent(content.id, rating, 'innovation')}
-                          description="How innovative is this approach?"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="mt-6 flex space-x-2">
-                      <Button variant="outline" size="sm">
-                        Add Comment
-                      </Button>
-                      <Button variant="outline" size="sm">
-                        Add to Opportunity Space
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {contents.map((content) => (
+          <Card key={content.id} className="hover:shadow-lg transition-shadow">
+            <div className="aspect-video bg-gray-200 relative">
+              <img 
+                src={content.image_url} 
+                alt={content.title}
+                className="w-full h-full object-cover rounded-t-lg"
+                onError={(e) => {
+                  e.target.style.display = 'none'
+                  e.target.nextSibling.style.display = 'flex'
+                }}
+              />
+              <div className="hidden w-full h-full bg-gray-200 items-center justify-center rounded-t-lg">
+                <span className="text-gray-400">Image placeholder</span>
+              </div>
+              <div className="absolute top-2 left-2 flex gap-2">
+                <Badge variant="secondary">
+                  {content.content_type}
+                </Badge>
+                <Badge variant="default">
+                  {content.industry}
+                </Badge>
+              </div>
             </div>
-          )}
-        </div>
+            
+            <CardContent className="p-4">
+              <h3 className="font-semibold text-lg mb-2">{content.title}</h3>
+              <p className="text-gray-600 text-sm mb-3">
+                by {content.creator_username} • {new Date(content.created_at).toLocaleDateString()}
+              </p>
+              <p className="text-gray-700 text-sm mb-4">
+                {content.short_description}
+              </p>
 
-        {/* Opportunity Spaces */}
-        <div>
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-xl font-semibold text-gray-900">Opportunity Spaces</h3>
-            <Button 
-              size="sm" 
-              onClick={() => setShowCreateSpace(true)}
-              className="flex items-center space-x-1"
-            >
-              <Plus className="h-4 w-4" />
-              <span>Create</span>
-            </Button>
-          </div>
-
-          {/* Create New Opportunity Space */}
-          {showCreateSpace && (
-            <Card className="mb-6">
-              <CardHeader>
-                <CardTitle className="text-lg">Create Opportunity Space</CardTitle>
-                <CardDescription>
-                  Define a strategic area for innovation
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Title
-                  </label>
-                  <Input
-                    placeholder="e.g., Smart Building Solutions"
-                    value={newSpace.title}
-                    onChange={(e) => setNewSpace(prev => ({ ...prev, title: e.target.value }))}
-                  />
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center space-x-2">
+                  <StarRating value={content.average_rating} readonly />
+                  <span className="text-sm text-gray-600">
+                    {content.average_rating} ({content.rating_count} ratings)
+                  </span>
                 </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Description
-                  </label>
-                  <Textarea
-                    placeholder="Describe the opportunity and its potential..."
-                    value={newSpace.description}
-                    onChange={(e) => setNewSpace(prev => ({ ...prev, description: e.target.value }))}
-                    rows={3}
-                  />
-                </div>
-
-                <div className="flex space-x-2">
-                  <Button 
-                    onClick={handleCreateOpportunitySpace}
-                    disabled={!newSpace.title.trim()}
-                    className="flex-1"
-                  >
-                    Create Space
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    onClick={() => setShowCreateSpace(false)}
-                  >
-                    Cancel
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Existing Opportunity Spaces */}
-          <div className="space-y-4">
-            {opportunitySpaces.map((space) => (
-              <Card key={space.id} className="hover:shadow-md transition-shadow cursor-pointer">
-                <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <CardTitle className="text-base">{space.title}</CardTitle>
-                      <CardDescription className="mt-1">
-                        {space.description}
-                      </CardDescription>
-                    </div>
-                    <Target className="h-5 w-5 text-blue-600 flex-shrink-0" />
+                <div className="flex items-center space-x-4">
+                  <div className="flex items-center space-x-1">
+                    <ThumbsUpIcon />
+                    <span className="text-sm text-gray-600">{content.rating_count}</span>
                   </div>
-                </CardHeader>
-                <CardContent className="pt-0">
-                  <div className="flex items-center justify-between text-sm text-gray-500">
-                    <div className="flex items-center space-x-4">
-                      <span className="flex items-center">
-                        <BarChart3 className="h-4 w-4 mr-1" />
-                        {space.content_count} items
-                      </span>
-                      <span className="flex items-center">
-                        <Star className="h-4 w-4 mr-1" />
-                        {space.average_score.toFixed(1)}
-                      </span>
-                    </div>
-                    <span>
-                      {new Date(space.created_at).toLocaleDateString()}
-                    </span>
+                  <div className="flex items-center space-x-1">
+                    <MessageCircleIcon />
+                    <span className="text-sm text-gray-600">{content.comment_count}</span>
                   </div>
-                </CardContent>
-              </Card>
-            ))}
+                </div>
+              </div>
 
-            {opportunitySpaces.length === 0 && !showCreateSpace && (
-              <Card>
-                <CardContent className="p-6 text-center">
-                  <Target className="h-8 w-8 text-gray-400 mx-auto mb-3" />
-                  <h4 className="font-medium text-gray-900 mb-2">No Opportunity Spaces</h4>
-                  <p className="text-sm text-gray-600 mb-4">
-                    Create strategic spaces to organize your innovation efforts
-                  </p>
-                  <Button 
-                    size="sm" 
-                    onClick={() => setShowCreateSpace(true)}
+              {content.user_rating ? (
+                <div className="bg-green-50 border border-green-200 rounded-md p-3">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-green-800">Your Rating:</span>
+                    <StarRating value={content.user_rating} readonly />
+                  </div>
+                  {content.user_comment && (
+                    <p className="text-sm text-green-700">"{content.user_comment}"</p>
+                  )}
+                  <Button
+                    variant="outline"
+                    className="mt-2 text-sm"
+                    onClick={() => {
+                      setSelectedContent(content)
+                      setRating(content.user_rating)
+                      setComment(content.user_comment || '')
+                    }}
                   >
-                    Create First Space
+                    Edit Rating
                   </Button>
-                </CardContent>
-              </Card>
-            )}
+                </div>
+              ) : (
+                <Button
+                  onClick={() => setSelectedContent(content)}
+                  className="w-full"
+                >
+                  Rate This Content
+                </Button>
+              )}
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Rating Modal */}
+      {selectedContent && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+            <h3 className="text-lg font-semibold mb-4">
+              {selectedContent.user_rating ? 'Edit Rating' : 'Rate Content'}
+            </h3>
+            
+            <div className="mb-4">
+              <h4 className="font-medium mb-2">{selectedContent.title}</h4>
+              <p className="text-sm text-gray-600 mb-4">{selectedContent.short_description}</p>
+            </div>
+
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Your Rating
+              </label>
+              <div className="flex items-center space-x-2">
+                <StarRating 
+                  value={rating} 
+                  onChange={setRating}
+                />
+                <span className="text-sm text-gray-600">
+                  {rating > 0 && `${rating} star${rating !== 1 ? 's' : ''}`}
+                </span>
+              </div>
+            </div>
+
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Comment (Optional)
+              </label>
+              <Textarea
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                placeholder="Share your thoughts about this content..."
+                rows={3}
+              />
+            </div>
+
+            <div className="flex justify-end space-x-2">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setSelectedContent(null)
+                  setRating(0)
+                  setComment('')
+                  setHoverRating(0)
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={() => handleRateContent(selectedContent.id, rating, comment)}
+                disabled={rating === 0}
+                className="flex items-center space-x-2"
+              >
+                <SendIcon />
+                <span>{selectedContent.user_rating ? 'Update' : 'Submit'} Rating</span>
+              </Button>
+            </div>
           </div>
         </div>
+      )}
+
+      {/* Statistics */}
+      <div className="mt-8">
+        <Card>
+          <CardHeader>
+            <CardTitle>Your Rating Activity</CardTitle>
+            <CardDescription>
+              Overview of your contributions to the community
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-blue-600">
+                  {contents.filter(c => c.user_rating).length}
+                </div>
+                <div className="text-sm text-gray-600">Contents Rated</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-green-600">
+                  {contents.filter(c => c.user_comment).length}
+                </div>
+                <div className="text-sm text-gray-600">Comments Written</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-purple-600">
+                  {contents.filter(c => c.user_rating).length > 0 
+                    ? Math.round(contents.filter(c => c.user_rating).reduce((sum, c) => sum + c.user_rating, 0) / contents.filter(c => c.user_rating).length * 10) / 10
+                    : 0}
+                </div>
+                <div className="text-sm text-gray-600">Average Rating Given</div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   )

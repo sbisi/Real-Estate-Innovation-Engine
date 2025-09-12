@@ -49,12 +49,6 @@ const ClockIcon = () => (
   </svg>
 )
 
-const AlertCircleIcon = () => (
-  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-  </svg>
-)
-
 // Local UI Components (NO external dependencies)
 const Button = ({ children, onClick, className = '', variant = 'default', disabled = false }) => {
   const baseClasses = 'px-4 py-2 rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed'
@@ -271,13 +265,12 @@ const IdeateRealize = () => {
       case 'completed':
         return <CheckCircleIcon />
       default:
-        return <AlertCircleIcon />
+        return <ClockIcon />
     }
   }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Header */}
       <div className="mb-8">
         <h2 className="text-3xl font-bold text-gray-900 mb-2">Ideate & Realize</h2>
         <p className="text-gray-600">
@@ -286,7 +279,6 @@ const IdeateRealize = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Ideas Section */}
         <div>
           <Card>
             <CardHeader>
@@ -355,7 +347,6 @@ const IdeateRealize = () => {
           </Card>
         </div>
 
-        {/* Projects Section */}
         <div>
           <Card>
             <CardHeader>
@@ -391,7 +382,6 @@ const IdeateRealize = () => {
                     </div>
                     <p className="text-gray-700 text-sm mb-3">{project.description}</p>
                     
-                    {/* Progress Bar */}
                     <div className="mb-3">
                       <div className="flex justify-between text-sm text-gray-600 mb-1">
                         <span>Progress</span>
@@ -591,7 +581,6 @@ const IdeateRealize = () => {
         </div>
       )}
 
-      {/* Statistics */}
       <div className="mt-8">
         <Card>
           <CardHeader>

@@ -25,24 +25,6 @@ const ListIcon = () => (
   </svg>
 )
 
-const TrendingUpIcon = () => (
-  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-  </svg>
-)
-
-const CpuIcon = () => (
-  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
-  </svg>
-)
-
-const LightbulbIcon = () => (
-  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-  </svg>
-)
-
 // Local UI Components (NO external dependencies)
 const Button = ({ children, onClick, className = '', variant = 'default' }) => {
   const baseClasses = 'px-4 py-2 rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'
@@ -165,45 +147,6 @@ const ExploreSelect = () => {
     setFilteredContents(filtered)
   }, [contents, searchTerm, selectedType, selectedIndustry])
 
-  const getTypeIcon = (type) => {
-    switch (type) {
-      case 'technology':
-        return <CpuIcon />
-      case 'trend':
-        return <TrendingUpIcon />
-      case 'inspiration':
-        return <LightbulbIcon />
-      default:
-        return null
-    }
-  }
-
-  const getTypeBadgeVariant = (type) => {
-    switch (type) {
-      case 'technology':
-        return 'danger'
-      case 'trend':
-        return 'warning'
-      case 'inspiration':
-        return 'secondary'
-      default:
-        return 'default'
-    }
-  }
-
-  const getTimeHorizonBadgeVariant = (horizon) => {
-    switch (horizon) {
-      case 'short':
-        return 'success'
-      case 'medium':
-        return 'secondary'
-      case 'long':
-        return 'warning'
-      default:
-        return 'default'
-    }
-  }
-
   if (loading) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -222,7 +165,6 @@ const ExploreSelect = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Header */}
       <div className="mb-8">
         <h2 className="text-3xl font-bold text-gray-900 mb-2">Explore & Select</h2>
         <p className="text-gray-600">
@@ -230,7 +172,6 @@ const ExploreSelect = () => {
         </p>
       </div>
 
-      {/* Search and Filters */}
       <div className="mb-6 space-y-4">
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="flex-1">
@@ -265,7 +206,6 @@ const ExploreSelect = () => {
           </div>
         </div>
 
-        {/* Filter Panel */}
         {showFilters && (
           <div className="bg-gray-50 p-4 rounded-lg">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -317,12 +257,10 @@ const ExploreSelect = () => {
         )}
       </div>
 
-      {/* Results Count */}
       <div className="mb-6">
         <p className="text-gray-600">{filteredContents.length} results</p>
       </div>
 
-      {/* Content Grid */}
       <div className={viewMode === 'grid' 
         ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" 
         : "space-y-4"
@@ -343,16 +281,13 @@ const ExploreSelect = () => {
                 <span className="text-gray-400">Image placeholder</span>
               </div>
               <div className="absolute top-2 left-2 flex gap-2">
-                <Badge variant={getTypeBadgeVariant(content.content_type)}>
-                  <span className="flex items-center gap-1">
-                    {getTypeIcon(content.content_type)}
-                    {content.content_type}
-                  </span>
+                <Badge variant="secondary">
+                  {content.content_type}
                 </Badge>
                 <Badge variant="default">
                   {content.industry}
                 </Badge>
-                <Badge variant={getTimeHorizonBadgeVariant(content.time_horizon)}>
+                <Badge variant="success">
                   {content.time_horizon} term
                 </Badge>
               </div>
