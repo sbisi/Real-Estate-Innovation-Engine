@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
-import ContentCard from '../ContentCard.jsx'
 
-// Simple SVG Icons (replacing lucide-react)
+// Simple SVG Icons (NO external dependencies)
 const SearchIcon = () => (
   <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -44,7 +43,7 @@ const LightbulbIcon = () => (
   </svg>
 )
 
-// Local UI Components (to avoid import issues)
+// Local UI Components (NO external dependencies)
 const Button = ({ children, onClick, className = '', variant = 'default' }) => {
   const baseClasses = 'px-4 py-2 rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'
   const variants = {
@@ -61,68 +60,6 @@ const Button = ({ children, onClick, className = '', variant = 'default' }) => {
 
 const Input = ({ className = '', ...props }) => (
   <input className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${className}`} {...props} />
-)
-
-const Select = ({ children, value, onValueChange }) => {
-  const [isOpen, setIsOpen] = useState(false)
-  
-  return (
-    <div className="relative">
-      {React.Children.map(children, child => {
-        if (child.type === SelectTrigger) {
-          return React.cloneElement(child, {
-            onClick: () => setIsOpen(!isOpen),
-            isOpen
-          })
-        }
-        if (child.type === SelectContent) {
-          return isOpen ? React.cloneElement(child, {
-            onValueChange: (val) => {
-              onValueChange(val)
-              setIsOpen(false)
-            }
-          }) : null
-        }
-        return child
-      })}
-    </div>
-  )
-}
-
-const SelectTrigger = ({ children, className = '', onClick, isOpen }) => (
-  <button
-    type="button"
-    onClick={onClick}
-    className={`flex h-10 w-full items-center justify-between rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ${className}`}
-  >
-    {children}
-    <svg className={`h-4 w-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-    </svg>
-  </button>
-)
-
-const SelectValue = ({ placeholder, children }) => (
-  <span className="block truncate">
-    {children || <span className="text-gray-500">{placeholder}</span>}
-  </span>
-)
-
-const SelectContent = ({ children, onValueChange }) => (
-  <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
-    {React.Children.map(children, child =>
-      React.cloneElement(child, { onValueChange })
-    )}
-  </div>
-)
-
-const SelectItem = ({ children, value, onValueChange }) => (
-  <div
-    className="relative flex cursor-pointer select-none items-center rounded-sm py-1.5 pl-2 pr-2 text-sm hover:bg-gray-100"
-    onClick={() => onValueChange(value)}
-  >
-    {children}
-  </div>
 )
 
 const Badge = ({ children, className = '', variant = 'default' }) => {
@@ -147,10 +84,10 @@ const ExploreSelect = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedType, setSelectedType] = useState('all')
   const [selectedIndustry, setSelectedIndustry] = useState('all')
-  const [viewMode, setViewMode] = useState('grid') // 'grid' or 'list'
+  const [viewMode, setViewMode] = useState('grid')
   const [showFilters, setShowFilters] = useState(false)
 
-  // Mock data for demonstration
+  // Mock data
   const mockContents = [
     {
       id: 1,
@@ -196,41 +133,10 @@ const ExploreSelect = () => {
       rating_count: 19,
       comment_count: 6,
       status: "approved"
-    },
-    {
-      id: 4,
-      title: "Blockchain Property Transactions",
-      short_description: "Decentralized ledger technology for secure, transparent, and efficient property transactions.",
-      content_type: "technology",
-      industry: "Real Estate",
-      time_horizon: "medium",
-      image_url: "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=400&h=300&fit=crop",
-      creator_username: "blockchain_dev",
-      created_at: "2024-01-12T16:45:00Z",
-      average_rating: 3.9,
-      rating_count: 11,
-      comment_count: 4,
-      status: "approved"
-    },
-    {
-      id: 5,
-      title: "Co-living and Flexible Spaces",
-      short_description: "Rising demand for flexible living arrangements and shared spaces in urban environments.",
-      content_type: "trend",
-      industry: "Real Estate",
-      time_horizon: "short",
-      image_url: "https://images.unsplash.com/photo-1555636222-cae831e670b3?w=400&h=300&fit=crop",
-      creator_username: "urban_planner",
-      created_at: "2024-01-11T11:20:00Z",
-      average_rating: 4.3,
-      rating_count: 17,
-      comment_count: 9,
-      status: "approved"
     }
   ]
 
   useEffect(() => {
-    // Simulate API call
     setTimeout(() => {
       setContents(mockContents)
       setFilteredContents(mockContents)
@@ -241,7 +147,6 @@ const ExploreSelect = () => {
   useEffect(() => {
     let filtered = contents
 
-    // Filter by search term
     if (searchTerm) {
       filtered = filtered.filter(content =>
         content.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -249,12 +154,10 @@ const ExploreSelect = () => {
       )
     }
 
-    // Filter by type
     if (selectedType !== 'all') {
       filtered = filtered.filter(content => content.content_type === selectedType)
     }
 
-    // Filter by industry
     if (selectedIndustry !== 'all') {
       filtered = filtered.filter(content => content.industry === selectedIndustry)
     }
@@ -370,33 +273,31 @@ const ExploreSelect = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Content Type
                 </label>
-                <Select value={selectedType} onValueChange={setSelectedType}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="All Types" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Types</SelectItem>
-                    <SelectItem value="technology">Technology</SelectItem>
-                    <SelectItem value="trend">Trend</SelectItem>
-                    <SelectItem value="inspiration">Inspiration</SelectItem>
-                  </SelectContent>
-                </Select>
+                <select 
+                  value={selectedType} 
+                  onChange={(e) => setSelectedType(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="all">All Types</option>
+                  <option value="technology">Technology</option>
+                  <option value="trend">Trend</option>
+                  <option value="inspiration">Inspiration</option>
+                </select>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Industry
                 </label>
-                <Select value={selectedIndustry} onValueChange={setSelectedIndustry}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="All Industries" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Industries</SelectItem>
-                    <SelectItem value="Real Estate">Real Estate</SelectItem>
-                    <SelectItem value="Technology">Technology</SelectItem>
-                    <SelectItem value="Finance">Finance</SelectItem>
-                  </SelectContent>
-                </Select>
+                <select 
+                  value={selectedIndustry} 
+                  onChange={(e) => setSelectedIndustry(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="all">All Industries</option>
+                  <option value="Real Estate">Real Estate</option>
+                  <option value="Technology">Technology</option>
+                  <option value="Finance">Finance</option>
+                </select>
               </div>
               <div className="flex items-end">
                 <Button
@@ -421,7 +322,7 @@ const ExploreSelect = () => {
         <p className="text-gray-600">{filteredContents.length} results</p>
       </div>
 
-      {/* Content Grid/List */}
+      {/* Content Grid */}
       <div className={viewMode === 'grid' 
         ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" 
         : "space-y-4"
