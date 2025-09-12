@@ -1,12 +1,123 @@
 import { useState, useEffect } from 'react'
-import { Button } from '@/components/ui/button.jsx'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card.jsx'
-import { Badge } from '@/components/ui/badge.jsx'
-import { Input } from '@/components/ui/input.jsx'
-import { Textarea } from '@/components/ui/textarea.jsx'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select.jsx'
-import { Progress } from '@/components/ui/progress.jsx'
-import { Lightbulb, Plus, Rocket, Calendar, Users, Target, CheckCircle, Clock, AlertCircle } from 'lucide-react'
+
+// Simple SVG Icons (NO external dependencies)
+const LightbulbIcon = () => (
+  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+  </svg>
+)
+
+const PlusIcon = () => (
+  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+  </svg>
+)
+
+const RocketIcon = () => (
+  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+  </svg>
+)
+
+const CalendarIcon = () => (
+  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+  </svg>
+)
+
+const UsersIcon = () => (
+  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+  </svg>
+)
+
+const TargetIcon = () => (
+  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+  </svg>
+)
+
+const CheckCircleIcon = () => (
+  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+  </svg>
+)
+
+const ClockIcon = () => (
+  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+  </svg>
+)
+
+const AlertCircleIcon = () => (
+  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+  </svg>
+)
+
+// Local UI Components (NO external dependencies)
+const Button = ({ children, onClick, className = '', variant = 'default', disabled = false }) => {
+  const baseClasses = 'px-4 py-2 rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed'
+  const variants = {
+    default: 'bg-blue-600 text-white hover:bg-blue-700',
+    outline: 'border border-gray-300 bg-white hover:bg-gray-50 text-gray-700',
+    ghost: 'hover:bg-gray-100 text-gray-700'
+  }
+  return (
+    <button onClick={onClick} disabled={disabled} className={`${baseClasses} ${variants[variant]} ${className}`}>
+      {children}
+    </button>
+  )
+}
+
+const Card = ({ children, className = '' }) => (
+  <div className={`bg-white shadow rounded-lg ${className}`}>{children}</div>
+)
+
+const CardHeader = ({ children, className = '' }) => (
+  <div className={`px-6 py-4 border-b ${className}`}>{children}</div>
+)
+
+const CardTitle = ({ children, className = '' }) => (
+  <h3 className={`text-lg font-semibold ${className}`}>{children}</h3>
+)
+
+const CardDescription = ({ children, className = '' }) => (
+  <p className={`text-gray-600 ${className}`}>{children}</p>
+)
+
+const CardContent = ({ children, className = '' }) => (
+  <div className={`px-6 py-4 ${className}`}>{children}</div>
+)
+
+const Badge = ({ children, className = '', variant = 'default' }) => {
+  const variants = {
+    default: 'bg-gray-100 text-gray-800',
+    secondary: 'bg-blue-100 text-blue-800',
+    success: 'bg-green-100 text-green-800',
+    warning: 'bg-yellow-100 text-yellow-800',
+    danger: 'bg-red-100 text-red-800'
+  }
+  return (
+    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${variants[variant]} ${className}`}>
+      {children}
+    </span>
+  )
+}
+
+const Input = ({ className = '', ...props }) => (
+  <input className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${className}`} {...props} />
+)
+
+const Textarea = ({ className = '', ...props }) => (
+  <textarea className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${className}`} {...props} />
+)
+
+const Progress = ({ value = 0, className = '' }) => (
+  <div className={`w-full bg-gray-200 rounded-full h-2 ${className}`}>
+    <div className="bg-blue-600 h-2 rounded-full transition-all duration-300" style={{ width: `${Math.min(100, Math.max(0, value))}%` }} />
+  </div>
+)
 
 const IdeateRealize = () => {
   const [ideas, setIdeas] = useState([])
@@ -32,80 +143,40 @@ const IdeateRealize = () => {
   const mockIdeas = [
     {
       id: 1,
-      title: "AI-Powered Energy Optimization",
-      description: "Develop an AI system that learns building usage patterns and automatically optimizes energy consumption.",
+      title: "Smart Building Energy Management",
+      description: "AI-powered system to optimize energy consumption in commercial buildings using IoT sensors and machine learning.",
       opportunity_space: "Smart Sustainable Buildings",
       priority: "high",
       status: "concept",
-      votes: 12,
-      comments: 5,
       created_at: "2024-01-15T10:00:00Z",
-      creator: "John Doe"
+      votes: 12,
+      comments: 5
     },
     {
       id: 2,
-      title: "Virtual Reality Property Staging",
-      description: "Create a VR platform that allows potential buyers to see properties with different furniture and decoration styles.",
-      opportunity_space: "Virtual Real Estate Experience",
+      title: "Virtual Property Staging Platform",
+      description: "AR/VR platform for virtual staging of properties to enhance marketing and reduce physical staging costs.",
+      opportunity_space: "Digital Property Experience",
       priority: "medium",
       status: "development",
-      votes: 8,
-      comments: 3,
       created_at: "2024-01-14T14:30:00Z",
-      creator: "Jane Smith"
-    },
-    {
-      id: 3,
-      title: "Blockchain Property History",
-      description: "Implement a blockchain-based system to track property history, maintenance records, and ownership changes.",
-      opportunity_space: "Smart Sustainable Buildings",
-      priority: "low",
-      status: "concept",
-      votes: 6,
-      comments: 2,
-      created_at: "2024-01-13T09:15:00Z",
-      creator: "Mike Johnson"
+      votes: 8,
+      comments: 3
     }
   ]
 
   const mockProjects = [
     {
       id: 1,
-      title: "Smart Building IoT Pilot",
-      description: "Pilot implementation of IoT sensors in Building A for energy monitoring and optimization.",
+      title: "Smart Building Pilot Program",
+      description: "Implementation of smart building technology in 3 commercial properties",
       idea_id: 1,
-      status: "in_progress",
-      progress: 65,
       timeline: "6 months",
-      budget: "$50,000",
+      budget: "$150,000",
       team_size: "5 people",
-      start_date: "2024-01-01",
-      end_date: "2024-06-30",
-      milestones: [
-        { name: "Sensor Installation", completed: true },
-        { name: "Data Collection Setup", completed: true },
-        { name: "AI Model Development", completed: false },
-        { name: "Testing & Optimization", completed: false }
-      ]
-    },
-    {
-      id: 2,
-      title: "VR Property Tour Platform",
-      description: "Development of a comprehensive VR platform for property tours and virtual staging.",
-      idea_id: 2,
-      status: "planning",
-      progress: 15,
-      timeline: "8 months",
-      budget: "$75,000",
-      team_size: "7 people",
-      start_date: "2024-02-01",
-      end_date: "2024-09-30",
-      milestones: [
-        { name: "Requirements Analysis", completed: true },
-        { name: "Technical Architecture", completed: false },
-        { name: "MVP Development", completed: false },
-        { name: "User Testing", completed: false }
-      ]
+      status: "in_progress",
+      progress: 35,
+      created_at: "2024-01-10T12:00:00Z"
     }
   ]
 
@@ -115,80 +186,92 @@ const IdeateRealize = () => {
   }, [])
 
   const handleCreateIdea = () => {
-    if (!newIdea.title.trim()) return
-
-    const idea = {
-      id: Date.now(),
-      ...newIdea,
-      status: 'concept',
-      votes: 0,
-      comments: 0,
-      created_at: new Date().toISOString(),
-      creator: 'Current User'
+    if (newIdea.title && newIdea.description) {
+      const idea = {
+        id: ideas.length + 1,
+        ...newIdea,
+        status: 'concept',
+        created_at: new Date().toISOString(),
+        votes: 0,
+        comments: 0
+      }
+      setIdeas(prev => [...prev, idea])
+      setNewIdea({
+        title: '',
+        description: '',
+        opportunity_space: '',
+        priority: 'medium'
+      })
+      setShowCreateIdea(false)
     }
-
-    setIdeas(prev => [idea, ...prev])
-    setNewIdea({
-      title: '',
-      description: '',
-      opportunity_space: '',
-      priority: 'medium'
-    })
-    setShowCreateIdea(false)
   }
 
   const handleCreateProject = () => {
-    if (!newProject.title.trim()) return
-
-    const project = {
-      id: Date.now(),
-      ...newProject,
-      status: 'planning',
-      progress: 0,
-      start_date: new Date().toISOString().split('T')[0],
-      milestones: []
+    if (newProject.title && newProject.description && newProject.idea_id) {
+      const project = {
+        id: projects.length + 1,
+        ...newProject,
+        status: 'planning',
+        progress: 0,
+        created_at: new Date().toISOString()
+      }
+      setProjects(prev => [...prev, project])
+      setNewProject({
+        title: '',
+        description: '',
+        idea_id: '',
+        timeline: '',
+        budget: '',
+        team_size: ''
+      })
+      setShowCreateProject(false)
     }
-
-    setProjects(prev => [project, ...prev])
-    setNewProject({
-      title: '',
-      description: '',
-      idea_id: '',
-      timeline: '',
-      budget: '',
-      team_size: ''
-    })
-    setShowCreateProject(false)
   }
 
-  const getPriorityColor = (priority) => {
+  const getPriorityBadgeVariant = (priority) => {
     switch (priority) {
-      case 'high': return 'bg-red-100 text-red-800'
-      case 'medium': return 'bg-yellow-100 text-yellow-800'
-      case 'low': return 'bg-green-100 text-green-800'
-      default: return 'bg-gray-100 text-gray-800'
+      case 'high':
+        return 'danger'
+      case 'medium':
+        return 'warning'
+      case 'low':
+        return 'secondary'
+      default:
+        return 'default'
     }
   }
 
-  const getStatusColor = (status) => {
+  const getStatusBadgeVariant = (status) => {
     switch (status) {
-      case 'concept': return 'bg-blue-100 text-blue-800'
-      case 'development': return 'bg-purple-100 text-purple-800'
-      case 'planning': return 'bg-orange-100 text-orange-800'
-      case 'in_progress': return 'bg-green-100 text-green-800'
-      case 'completed': return 'bg-gray-100 text-gray-800'
-      default: return 'bg-gray-100 text-gray-800'
+      case 'concept':
+        return 'secondary'
+      case 'development':
+        return 'warning'
+      case 'planning':
+        return 'secondary'
+      case 'in_progress':
+        return 'warning'
+      case 'completed':
+        return 'success'
+      default:
+        return 'default'
     }
   }
 
   const getStatusIcon = (status) => {
     switch (status) {
-      case 'concept': return <Lightbulb className="h-4 w-4" />
-      case 'development': return <Rocket className="h-4 w-4" />
-      case 'planning': return <Calendar className="h-4 w-4" />
-      case 'in_progress': return <Clock className="h-4 w-4" />
-      case 'completed': return <CheckCircle className="h-4 w-4" />
-      default: return <AlertCircle className="h-4 w-4" />
+      case 'concept':
+        return <LightbulbIcon />
+      case 'development':
+        return <ClockIcon />
+      case 'planning':
+        return <CalendarIcon />
+      case 'in_progress':
+        return <ClockIcon />
+      case 'completed':
+        return <CheckCircleIcon />
+      default:
+        return <AlertCircleIcon />
     }
   }
 
@@ -198,365 +281,354 @@ const IdeateRealize = () => {
       <div className="mb-8">
         <h2 className="text-3xl font-bold text-gray-900 mb-2">Ideate & Realize</h2>
         <p className="text-gray-600">
-          Generate ideas and manage innovation projects from concept to completion
+          Transform opportunity spaces into actionable ideas and realize them through structured projects
         </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Ideas Section */}
         <div>
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-xl font-semibold text-gray-900">Ideas</h3>
-            <Button 
-              size="sm" 
-              onClick={() => setShowCreateIdea(true)}
-              className="flex items-center space-x-1"
-            >
-              <Plus className="h-4 w-4" />
-              <span>New Idea</span>
-            </Button>
-          </div>
-
-          {/* Create New Idea */}
-          {showCreateIdea && (
-            <Card className="mb-6">
-              <CardHeader>
-                <CardTitle className="text-lg">Create New Idea</CardTitle>
-                <CardDescription>
-                  Share your innovative concept
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Title
-                  </label>
-                  <Input
-                    placeholder="e.g., Smart Parking Solution"
-                    value={newIdea.title}
-                    onChange={(e) => setNewIdea(prev => ({ ...prev, title: e.target.value }))}
-                  />
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <LightbulbIcon />
+                  <span>Ideas</span>
                 </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Description
-                  </label>
-                  <Textarea
-                    placeholder="Describe your idea and its potential impact..."
-                    value={newIdea.description}
-                    onChange={(e) => setNewIdea(prev => ({ ...prev, description: e.target.value }))}
-                    rows={3}
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Opportunity Space
-                    </label>
-                    <Select value={newIdea.opportunity_space} onValueChange={(value) => setNewIdea(prev => ({ ...prev, opportunity_space: value }))}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select space" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Smart Sustainable Buildings">Smart Sustainable Buildings</SelectItem>
-                        <SelectItem value="Virtual Real Estate Experience">Virtual Real Estate Experience</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Priority
-                    </label>
-                    <Select value={newIdea.priority} onValueChange={(value) => setNewIdea(prev => ({ ...prev, priority: value }))}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select priority" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="high">High</SelectItem>
-                        <SelectItem value="medium">Medium</SelectItem>
-                        <SelectItem value="low">Low</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                <div className="flex space-x-2">
-                  <Button 
-                    onClick={handleCreateIdea}
-                    disabled={!newIdea.title.trim()}
-                    className="flex-1"
-                  >
-                    Create Idea
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    onClick={() => setShowCreateIdea(false)}
-                  >
-                    Cancel
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Ideas List */}
-          <div className="space-y-4">
-            {ideas.map((idea) => (
-              <Card key={idea.id} className="hover:shadow-md transition-shadow">
-                <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-2 mb-2">
-                        <Badge className={getPriorityColor(idea.priority)}>
+                <Button
+                  onClick={() => setShowCreateIdea(true)}
+                  className="flex items-center space-x-1"
+                >
+                  <PlusIcon />
+                  <span>New Idea</span>
+                </Button>
+              </CardTitle>
+              <CardDescription>
+                Innovative concepts derived from opportunity spaces
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {ideas.map((idea) => (
+                  <div key={idea.id} className="border rounded-lg p-4">
+                    <div className="flex justify-between items-start mb-3">
+                      <h4 className="font-semibold text-lg">{idea.title}</h4>
+                      <div className="flex space-x-2">
+                        <Badge variant={getPriorityBadgeVariant(idea.priority)}>
                           {idea.priority}
                         </Badge>
-                        <Badge className={getStatusColor(idea.status)}>
-                          {getStatusIcon(idea.status)}
-                          <span className="ml-1">{idea.status}</span>
+                        <Badge variant={getStatusBadgeVariant(idea.status)}>
+                          <span className="flex items-center gap-1">
+                            {getStatusIcon(idea.status)}
+                            {idea.status}
+                          </span>
                         </Badge>
                       </div>
-                      <CardTitle className="text-base">{idea.title}</CardTitle>
-                      <CardDescription className="mt-1">
-                        {idea.description}
-                      </CardDescription>
+                    </div>
+                    <p className="text-gray-700 text-sm mb-3">{idea.description}</p>
+                    <div className="flex items-center justify-between text-sm text-gray-500">
+                      <span>Space: {idea.opportunity_space}</span>
+                      <div className="flex space-x-4">
+                        <span>{idea.votes} votes</span>
+                        <span>{idea.comments} comments</span>
+                      </div>
+                    </div>
+                    <div className="mt-3 flex space-x-2">
+                      <Button variant="outline" className="text-sm">
+                        View Details
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        className="text-sm"
+                        onClick={() => {
+                          setNewProject(prev => ({ ...prev, idea_id: idea.id }))
+                          setShowCreateProject(true)
+                        }}
+                      >
+                        Create Project
+                      </Button>
                     </div>
                   </div>
-                </CardHeader>
-                <CardContent className="pt-0">
-                  <div className="flex items-center justify-between text-sm text-gray-500 mb-3">
-                    <span>by {idea.creator}</span>
-                    <span>{new Date(idea.created_at).toLocaleDateString()}</span>
-                  </div>
-                  
-                  {idea.opportunity_space && (
-                    <div className="mb-3">
-                      <Badge variant="outline" className="text-xs">
-                        <Target className="h-3 w-3 mr-1" />
-                        {idea.opportunity_space}
-                      </Badge>
-                    </div>
-                  )}
-
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4 text-sm text-gray-500">
-                      <span className="flex items-center">
-                        <Lightbulb className="h-4 w-4 mr-1" />
-                        {idea.votes} votes
-                      </span>
-                      <span>{idea.comments} comments</span>
-                    </div>
-                    <Button size="sm" variant="outline">
-                      Start Project
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Projects Section */}
         <div>
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-xl font-semibold text-gray-900">Projects</h3>
-            <Button 
-              size="sm" 
-              onClick={() => setShowCreateProject(true)}
-              className="flex items-center space-x-1"
-            >
-              <Plus className="h-4 w-4" />
-              <span>New Project</span>
-            </Button>
-          </div>
-
-          {/* Create New Project */}
-          {showCreateProject && (
-            <Card className="mb-6">
-              <CardHeader>
-                <CardTitle className="text-lg">Create New Project</CardTitle>
-                <CardDescription>
-                  Turn an idea into a project
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Project Title
-                  </label>
-                  <Input
-                    placeholder="e.g., Smart Parking Implementation"
-                    value={newProject.title}
-                    onChange={(e) => setNewProject(prev => ({ ...prev, title: e.target.value }))}
-                  />
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <RocketIcon />
+                  <span>Projects</span>
                 </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Description
-                  </label>
-                  <Textarea
-                    placeholder="Describe the project scope and objectives..."
-                    value={newProject.description}
-                    onChange={(e) => setNewProject(prev => ({ ...prev, description: e.target.value }))}
-                    rows={3}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Based on Idea
-                  </label>
-                  <Select value={newProject.idea_id} onValueChange={(value) => setNewProject(prev => ({ ...prev, idea_id: value }))}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select idea" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {ideas.map((idea) => (
-                        <SelectItem key={idea.id} value={idea.id.toString()}>
-                          {idea.title}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="grid grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Timeline
-                    </label>
-                    <Input
-                      placeholder="6 months"
-                      value={newProject.timeline}
-                      onChange={(e) => setNewProject(prev => ({ ...prev, timeline: e.target.value }))}
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Budget
-                    </label>
-                    <Input
-                      placeholder="$50,000"
-                      value={newProject.budget}
-                      onChange={(e) => setNewProject(prev => ({ ...prev, budget: e.target.value }))}
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Team Size
-                    </label>
-                    <Input
-                      placeholder="5 people"
-                      value={newProject.team_size}
-                      onChange={(e) => setNewProject(prev => ({ ...prev, team_size: e.target.value }))}
-                    />
-                  </div>
-                </div>
-
-                <div className="flex space-x-2">
-                  <Button 
-                    onClick={handleCreateProject}
-                    disabled={!newProject.title.trim()}
-                    className="flex-1"
-                  >
-                    Create Project
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    onClick={() => setShowCreateProject(false)}
-                  >
-                    Cancel
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Projects List */}
-          <div className="space-y-4">
-            {projects.map((project) => (
-              <Card key={project.id} className="hover:shadow-md transition-shadow">
-                <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-2 mb-2">
-                        <Badge className={getStatusColor(project.status)}>
+                <Button
+                  onClick={() => setShowCreateProject(true)}
+                  className="flex items-center space-x-1"
+                >
+                  <PlusIcon />
+                  <span>New Project</span>
+                </Button>
+              </CardTitle>
+              <CardDescription>
+                Active implementation projects from ideas
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {projects.map((project) => (
+                  <div key={project.id} className="border rounded-lg p-4">
+                    <div className="flex justify-between items-start mb-3">
+                      <h4 className="font-semibold text-lg">{project.title}</h4>
+                      <Badge variant={getStatusBadgeVariant(project.status)}>
+                        <span className="flex items-center gap-1">
                           {getStatusIcon(project.status)}
-                          <span className="ml-1">{project.status}</span>
-                        </Badge>
+                          {project.status}
+                        </span>
+                      </Badge>
+                    </div>
+                    <p className="text-gray-700 text-sm mb-3">{project.description}</p>
+                    
+                    {/* Progress Bar */}
+                    <div className="mb-3">
+                      <div className="flex justify-between text-sm text-gray-600 mb-1">
+                        <span>Progress</span>
+                        <span>{project.progress}%</span>
                       </div>
-                      <CardTitle className="text-base">{project.title}</CardTitle>
-                      <CardDescription className="mt-1">
-                        {project.description}
-                      </CardDescription>
+                      <Progress value={project.progress} />
                     </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="pt-0">
-                  {/* Progress */}
-                  <div className="mb-4">
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm font-medium text-gray-700">Progress</span>
-                      <span className="text-sm text-gray-500">{project.progress}%</span>
-                    </div>
-                    <Progress value={project.progress} className="h-2" />
-                  </div>
 
-                  {/* Project Details */}
-                  <div className="grid grid-cols-3 gap-4 mb-4 text-sm">
-                    <div>
-                      <span className="text-gray-500">Timeline:</span>
-                      <p className="font-medium">{project.timeline}</p>
-                    </div>
-                    <div>
-                      <span className="text-gray-500">Budget:</span>
-                      <p className="font-medium">{project.budget}</p>
-                    </div>
-                    <div>
-                      <span className="text-gray-500">Team:</span>
-                      <p className="font-medium">{project.team_size}</p>
-                    </div>
-                  </div>
-
-                  {/* Milestones */}
-                  {project.milestones && project.milestones.length > 0 && (
-                    <div className="mb-4">
-                      <h5 className="text-sm font-medium text-gray-700 mb-2">Milestones</h5>
-                      <div className="space-y-1">
-                        {project.milestones.map((milestone, index) => (
-                          <div key={index} className="flex items-center space-x-2 text-sm">
-                            {milestone.completed ? (
-                              <CheckCircle className="h-4 w-4 text-green-600" />
-                            ) : (
-                              <Clock className="h-4 w-4 text-gray-400" />
-                            )}
-                            <span className={milestone.completed ? 'text-gray-900' : 'text-gray-500'}>
-                              {milestone.name}
-                            </span>
-                          </div>
-                        ))}
+                    <div className="grid grid-cols-2 gap-4 text-sm text-gray-600 mb-3">
+                      <div className="flex items-center space-x-1">
+                        <CalendarIcon />
+                        <span>{project.timeline}</span>
+                      </div>
+                      <div className="flex items-center space-x-1">
+                        <UsersIcon />
+                        <span>{project.team_size}</span>
+                      </div>
+                      <div className="flex items-center space-x-1">
+                        <TargetIcon />
+                        <span>{project.budget}</span>
+                      </div>
+                      <div className="flex items-center space-x-1">
+                        <span>Idea #{project.idea_id}</span>
                       </div>
                     </div>
-                  )}
 
-                  <div className="flex space-x-2">
-                    <Button size="sm" variant="outline" className="flex-1">
-                      View Details
-                    </Button>
-                    <Button size="sm" variant="outline">
-                      Update Progress
-                    </Button>
+                    <div className="flex space-x-2">
+                      <Button variant="outline" className="text-sm">
+                        View Details
+                      </Button>
+                      <Button variant="outline" className="text-sm">
+                        Update Progress
+                      </Button>
+                    </div>
                   </div>
-                </CardContent>
-              </Card>
-            ))}
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      {/* Create Idea Modal */}
+      {showCreateIdea && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+            <h3 className="text-lg font-semibold mb-4">Create New Idea</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Title
+                </label>
+                <Input
+                  value={newIdea.title}
+                  onChange={(e) => setNewIdea(prev => ({ ...prev, title: e.target.value }))}
+                  placeholder="Enter idea title"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Description
+                </label>
+                <Textarea
+                  value={newIdea.description}
+                  onChange={(e) => setNewIdea(prev => ({ ...prev, description: e.target.value }))}
+                  placeholder="Describe your idea"
+                  rows={3}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Opportunity Space
+                </label>
+                <Input
+                  value={newIdea.opportunity_space}
+                  onChange={(e) => setNewIdea(prev => ({ ...prev, opportunity_space: e.target.value }))}
+                  placeholder="Related opportunity space"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Priority
+                </label>
+                <select 
+                  value={newIdea.priority} 
+                  onChange={(e) => setNewIdea(prev => ({ ...prev, priority: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high">High</option>
+                </select>
+              </div>
+            </div>
+            <div className="flex justify-end space-x-2 mt-6">
+              <Button
+                variant="outline"
+                onClick={() => setShowCreateIdea(false)}
+              >
+                Cancel
+              </Button>
+              <Button onClick={handleCreateIdea}>
+                Create Idea
+              </Button>
+            </div>
           </div>
         </div>
+      )}
+
+      {/* Create Project Modal */}
+      {showCreateProject && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+            <h3 className="text-lg font-semibold mb-4">Create New Project</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Title
+                </label>
+                <Input
+                  value={newProject.title}
+                  onChange={(e) => setNewProject(prev => ({ ...prev, title: e.target.value }))}
+                  placeholder="Enter project title"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Description
+                </label>
+                <Textarea
+                  value={newProject.description}
+                  onChange={(e) => setNewProject(prev => ({ ...prev, description: e.target.value }))}
+                  placeholder="Describe the project"
+                  rows={3}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Based on Idea
+                </label>
+                <select 
+                  value={newProject.idea_id} 
+                  onChange={(e) => setNewProject(prev => ({ ...prev, idea_id: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">Select an idea</option>
+                  {ideas.map(idea => (
+                    <option key={idea.id} value={idea.id}>{idea.title}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Timeline
+                  </label>
+                  <Input
+                    value={newProject.timeline}
+                    onChange={(e) => setNewProject(prev => ({ ...prev, timeline: e.target.value }))}
+                    placeholder="e.g., 6 months"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Budget
+                  </label>
+                  <Input
+                    value={newProject.budget}
+                    onChange={(e) => setNewProject(prev => ({ ...prev, budget: e.target.value }))}
+                    placeholder="e.g., $100,000"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Team Size
+                </label>
+                <Input
+                  value={newProject.team_size}
+                  onChange={(e) => setNewProject(prev => ({ ...prev, team_size: e.target.value }))}
+                  placeholder="e.g., 5 people"
+                />
+              </div>
+            </div>
+            <div className="flex justify-end space-x-2 mt-6">
+              <Button
+                variant="outline"
+                onClick={() => setShowCreateProject(false)}
+              >
+                Cancel
+              </Button>
+              <Button onClick={handleCreateProject}>
+                Create Project
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Statistics */}
+      <div className="mt-8">
+        <Card>
+          <CardHeader>
+            <CardTitle>Innovation Pipeline</CardTitle>
+            <CardDescription>
+              Overview of ideas and projects in the innovation pipeline
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-blue-600">
+                  {ideas.length}
+                </div>
+                <div className="text-sm text-gray-600">Total Ideas</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-green-600">
+                  {projects.length}
+                </div>
+                <div className="text-sm text-gray-600">Active Projects</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-purple-600">
+                  {ideas.filter(i => i.priority === 'high').length}
+                </div>
+                <div className="text-sm text-gray-600">High Priority Ideas</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-orange-600">
+                  {projects.filter(p => p.status === 'in_progress').length}
+                </div>
+                <div className="text-sm text-gray-600">In Progress</div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   )
