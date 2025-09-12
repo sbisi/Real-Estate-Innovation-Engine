@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
 import Header from './components/Header'
 import ExploreSelect from './components/modules/ExploreSelect'
 import AddConnect from './components/modules/AddConnect'
@@ -34,9 +34,9 @@ const HomePage = () => {
           <p className="text-gray-600 text-sm mb-4">
             Discover and evaluate emerging trends, technologies, and opportunities in real estate.
           </p>
-          <a href="/explore-select" className="text-blue-600 hover:text-blue-700 font-medium text-sm">
+          <Link to="/explore-select" className="text-blue-600 hover:text-blue-700 font-medium text-sm">
             Explore Module →
-          </a>
+          </Link>
         </div>
 
         <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
@@ -49,9 +49,9 @@ const HomePage = () => {
           <p className="text-gray-600 text-sm mb-4">
             Add new content, create connections, and build your innovation network.
           </p>
-          <a href="/add-connect" className="text-blue-600 hover:text-blue-700 font-medium text-sm">
+          <Link to="/add-connect" className="text-blue-600 hover:text-blue-700 font-medium text-sm">
             Add Content →
-          </a>
+          </Link>
         </div>
 
         <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
@@ -64,9 +64,9 @@ const HomePage = () => {
           <p className="text-gray-600 text-sm mb-4">
             Rate existing content and create comprehensive reviews for the community.
           </p>
-          <a href="/rate-create" className="text-blue-600 hover:text-blue-700 font-medium text-sm">
+          <Link to="/rate-create" className="text-blue-600 hover:text-blue-700 font-medium text-sm">
             Rate Content →
-          </a>
+          </Link>
         </div>
 
         <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
@@ -79,9 +79,9 @@ const HomePage = () => {
           <p className="text-gray-600 text-sm mb-4">
             Transform opportunity spaces into actionable ideas and realize them through projects.
           </p>
-          <a href="/ideate-realize" className="text-blue-600 hover:text-blue-700 font-medium text-sm">
+          <Link to="/ideate-realize" className="text-blue-600 hover:text-blue-700 font-medium text-sm">
             Start Ideating →
-          </a>
+          </Link>
         </div>
 
         <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
@@ -94,9 +94,9 @@ const HomePage = () => {
           <p className="text-gray-600 text-sm mb-4">
             Monitor and analyze trend lifecycle phases and their impact on the industry.
           </p>
-          <a href="/trend-dashboard" className="text-blue-600 hover:text-blue-700 font-medium text-sm">
+          <Link to="/trend-dashboard" className="text-blue-600 hover:text-blue-700 font-medium text-sm">
             View Dashboard →
-          </a>
+          </Link>
         </div>
 
         <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
@@ -109,9 +109,9 @@ const HomePage = () => {
           <p className="text-gray-600 text-sm mb-4">
             Advanced analytics and insights into trend patterns, correlations, and predictions.
           </p>
-          <a href="/trend-analytics" className="text-blue-600 hover:text-blue-700 font-medium text-sm">
+          <Link to="/trend-analytics" className="text-blue-600 hover:text-blue-700 font-medium text-sm">
             View Analytics →
-          </a>
+          </Link>
         </div>
       </div>
 
