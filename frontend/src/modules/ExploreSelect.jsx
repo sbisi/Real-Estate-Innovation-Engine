@@ -1,6 +1,48 @@
 import { useState, useEffect } from 'react'
 import ContentCard from '../ContentCard.jsx'
-import { Search, Filter, Grid, List, TrendingUp, Cpu, Lightbulb } from 'lucide-react'
+
+// Simple SVG Icons (replacing lucide-react)
+const SearchIcon = () => (
+  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+  </svg>
+)
+
+const FilterIcon = () => (
+  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+  </svg>
+)
+
+const GridIcon = () => (
+  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+  </svg>
+)
+
+const ListIcon = () => (
+  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+  </svg>
+)
+
+const TrendingUpIcon = () => (
+  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+  </svg>
+)
+
+const CpuIcon = () => (
+  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+  </svg>
+)
+
+const LightbulbIcon = () => (
+  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+  </svg>
+)
 
 // Local UI Components (to avoid import issues)
 const Button = ({ children, onClick, className = '', variant = 'default' }) => {
@@ -223,11 +265,11 @@ const ExploreSelect = () => {
   const getTypeIcon = (type) => {
     switch (type) {
       case 'technology':
-        return <Cpu className="h-4 w-4" />
+        return <CpuIcon />
       case 'trend':
-        return <TrendingUp className="h-4 w-4" />
+        return <TrendingUpIcon />
       case 'inspiration':
-        return <Lightbulb className="h-4 w-4" />
+        return <LightbulbIcon />
       default:
         return null
     }
@@ -290,7 +332,9 @@ const ExploreSelect = () => {
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="flex-1">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                <SearchIcon />
+              </div>
               <Input
                 placeholder="Search trends, technologies, inspirations..."
                 value={searchTerm}
@@ -304,18 +348,16 @@ const ExploreSelect = () => {
               variant="outline"
               onClick={() => setShowFilters(!showFilters)}
             >
-              <Filter className="h-4 w-4 mr-2" />
-              Filters
+              <div className="flex items-center space-x-2">
+                <FilterIcon />
+                <span>Filters</span>
+              </div>
             </Button>
             <Button
               variant="outline"
               onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
             >
-              {viewMode === 'grid' ? (
-                <List className="h-4 w-4" />
-              ) : (
-                <Grid className="h-4 w-4" />
-              )}
+              {viewMode === 'grid' ? <ListIcon /> : <GridIcon />}
             </Button>
           </div>
         </div>
@@ -448,7 +490,9 @@ const ExploreSelect = () => {
 
       {filteredContents.length === 0 && (
         <div className="text-center py-12">
-          <Search className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+          <div className="mx-auto mb-4 text-gray-400">
+            <SearchIcon />
+          </div>
           <h3 className="text-lg font-medium text-gray-900 mb-2">No results found</h3>
           <p className="text-gray-600">
             Try adjusting your search terms or filters to find what you're looking for.
